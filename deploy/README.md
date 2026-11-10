@@ -35,6 +35,9 @@ only if you really want to wipe the volumes too.
 
 ## Put it on a server
 
+**Oracle Cloud step by step (Always Free):** see [`ORACLE.md`](ORACLE.md).
+
+
 1. Get a Linux server: Oracle Cloud *Always Free*, or a small Hetzner / DigitalOcean machine.
    1–2 GB of RAM is enough.
 2. Point a domain at it: an `A` record for `normie.example.com` → the server's IP address.
