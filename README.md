@@ -20,7 +20,7 @@ approval before anything changes**.
 ![Tests](https://img.shields.io/badge/tests-37_passing-6D5CF5)
 ![License](https://img.shields.io/badge/license-all_rights_reserved-0A0C10)
 
-[**Quickstart**](#-quickstart) · [**How it works**](#-how-it-works) · [**Features**](#-features) · [**DBMS syllabus**](#-built-on-the-dbms-syllabus) · [**Deploy**](deploy/README.md) · [**Full write-up**](docs/HOW_IT_WORKS.md)
+[**Live demo ↗**](https://normie-db.duckdns.org) · [**Quickstart**](#-quickstart) · [**How it works**](#-how-it-works) · [**Features**](#-features) · [**DBMS syllabus**](#-built-on-the-dbms-syllabus) · [**Deploy**](deploy/README.md) · [**Full write-up**](docs/HOW_IT_WORKS.md)
 
 </div>
 
