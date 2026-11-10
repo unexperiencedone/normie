@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: "Normie",
   authors: [{ name: "Aakshant Kumar" }],
-  openGraph: { type: "website", siteName: "Normie", title: "Normie · your data, but make it normal", description: DESCRIPTION },
+  openGraph: { type: "website", url: "/", siteName: "Normie", title: "Normie · your data, but make it normal", description: DESCRIPTION },
   twitter: { card: "summary_large_image", title: "Normie · your data, but make it normal", description: DESCRIPTION },
 };
 

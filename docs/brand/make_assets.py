@@ -116,8 +116,9 @@ def share_image() -> None:
     art = art.resize((round(art.width * scale), round(art.height * scale)), Image.LANCZOS)
     card = Image.new("RGB", (1200, 630), (10, 12, 16))
     card.paste(art, ((1200 - art.width) // 2, (630 - art.height) // 2))
-    for name in ("opengraph-image.png", "twitter-image.png"):
-        card.save(OUT_APP / name, optimize=True)
+    # JPEG: the format WhatsApp/Facebook previews handle most reliably, and small enough for mobile data
+    for name in ("opengraph-image.jpg", "twitter-image.jpg"):
+        card.save(OUT_APP / name, quality=88, optimize=True, progressive=True)
     card.save(OUT_DOCS / "share-card.png")
     print("share card", art.size)
 
