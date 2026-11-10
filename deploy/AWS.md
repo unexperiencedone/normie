@@ -109,3 +109,29 @@ Backup before ending: `docker compose --env-file .env.docker exec -T db pg_dumpa
 then copy it to your laptop with `scp -i ~/Downloads/normie.pem ubuntu@<PUBLIC_IP>:~/normie/normie-backup.sql .`
 
 Updating, logs and troubleshooting are the same as in [`ORACLE.md`](ORACLE.md#everyday-operations).
+
+---
+
+## What the live server runs (set up on 10 Nov 2026)
+
+| | |
+|---|---|
+| Address | **https://normie-db.duckdns.org** (also `https://44-200-183-73.sslip.io`) |
+| Instance | t4g.small (ARM, 2 vCPU, 2 GB) + 2 GB swap, Ubuntu 24.04, 20 GB disk |
+| HTTPS | Let's Encrypt certificate, obtained and renewed automatically by Caddy |
+| DuckDNS updater | `~/duckdns/duck.sh` runs every 5 minutes (cron), so the name follows the server if its IP changes. The token is stored in `~/duckdns/token` (private). |
+| Daily backup | `~/backup-normie.sh` runs at 03:30 UTC (09:00 IST): `pg_dumpall` of every database plus a copy of `.env.docker`, into `~/backups/`, keeping the 7 newest |
+
+Copy the latest backup to your laptop:
+
+```bash
+scp -i ~/Downloads/normie.pem "ubuntu@normie-db.duckdns.org:backups/*$(date +%F)*" ~/normie-backups/
+```
+
+Restore everything from a dump (on a fresh server, after `up -d`):
+
+```bash
+zcat normie-YYYY-MM-DD.sql.gz | docker compose --env-file .env.docker exec -T db psql -U postgres -d postgres
+```
+
+Use the **same `.env.docker`** (it is in the backup) so `CREDENTIALS_KEY` still matches the stored passwords.
