@@ -1,0 +1,27 @@
+# --- secrets: never commit (examples are kept) ---
+.env
+.env.*
+!.env.example
+!deploy/.env.docker.example
+legacy/.env.backup
+
+# --- local data and runtime output ---
+.pgdata/
+var/
+*.db
+*.dump
+*.log
+
+# --- dependencies and build output ---
+.venv/
+node_modules/
+.next/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- tooling ---
+.playwright-mcp/
+.DS_Store
+scratch/
+.agents/

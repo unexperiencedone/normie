@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16
+    environment: { POSTGRES_USER: dbforge, POSTGRES_PASSWORD: change_me, POSTGRES_DB: control }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    command: ["postgres", "-c", "max_connections=200", "-c", "shared_preload_libraries=pg_stat_statements"]
+  pgbouncer:
+    image: edoburu/pgbouncer
+    environment:
+      DB_HOST: postgres
+      DB_USER: dbforge
+      DB_PASSWORD: change_me
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 2000
+      DEFAULT_POOL_SIZE: 50
+    ports: ["6432:5432"]
+    depends_on: [postgres]
+  redis:
+    image: redis:7
+  api:
+    build: ./backend
+    env_file: .env
+    ports: ["8000:8000"]
+    depends_on: [pgbouncer, redis]
+  worker:
+    build: ./backend
+    command: ["python", "-m", "dbforge.workers"]
+    env_file: .env
+    depends_on: [pgbouncer, redis]
+  web:
+    build: ./web
+    ports: ["3000:3000"]
+    depends_on: [api]
+  prometheus:
+    image: prom/prometheus
+    ports: ["9090:9090"]
+  grafana:
+    image: grafana/grafana
+    ports: ["3001:3000"]
+volumes:
+  pgdata:

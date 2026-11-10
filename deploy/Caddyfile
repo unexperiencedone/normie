@@ -1,0 +1,21 @@
+# Caddy is the only thing exposed to the internet. It serves HTTPS (certificates are obtained and
+# renewed automatically when DOMAIN is a real domain name) and splits traffic:
+#   /api/*      -> the FastAPI container (directly, so the copilot's long streams are not cut off)
+#   everything  -> the Next.js website container
+{$DOMAIN::80} {
+	handle /api/* {
+		reverse_proxy api:8000 {
+			# stream server-sent events (the copilot) immediately instead of buffering them
+			flush_interval -1
+		}
+	}
+	handle {
+		encode zstd gzip
+		reverse_proxy web:3000
+	}
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

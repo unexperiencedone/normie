@@ -1,0 +1,435 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ design tokens
+   Normie: paper/ink surfaces, lime as the brand mark, violet as the one interactive colour.
+   Every interactive colour has a scale: base -> hover (one step) -> pressed (two steps) -> ring.
+   Risk semantics: low = ok (lime-green), medium = warn (tangerine), high = danger (red). */
+:root {
+  --bg: #f4f5f0;
+  --surface: #ffffff;
+  --surface-2: #f7f8f4;
+  --surface-3: #ebede5;
+  --border: #e1e4da;
+  --border-strong: #cdd1c4;
+  --text: #0a0c10;
+  --text-2: #4a505b;
+  --muted: #646a75;
+  --accent: #6d5cf5;
+  --accent-hover: #5a48e0;
+  --accent-press: #4836c4;
+  --accent-soft: #eeebff;
+  --accent-fg: #ffffff;
+  --accent-ring: #b3a8ff;
+  --brand: #c8f560;
+  --brand-strong: #8ab52a;
+  --brand-soft: #f1fbd6;
+  --brand-fg: #0a0c10;
+  --brand-text: #4f6b0f;
+  --ok: #4f6b0f;
+  --ok-soft: #eef8d8;
+  --warn: #b4470a;
+  --warn-soft: #ffeedf;
+  --danger: #c02626;
+  --danger-soft: #fdecec;
+  --info: #0d6f7b;
+  --info-soft: #e1f7f9;
+  --code-bg: #f7f8f4;
+  --shadow: 0 1px 2px rgb(10 12 16 / 0.05), 0 2px 8px rgb(10 12 16 / 0.04);
+  --shadow-2: 0 1px 2px rgb(10 12 16 / 0.06), 0 10px 30px rgb(10 12 16 / 0.1);
+  --shadow-3: 0 2px 4px rgb(10 12 16 / 0.06), 0 24px 60px rgb(10 12 16 / 0.14), 0 30px 80px -30px rgb(109 92 245 / 0.35);
+  --glow: 0 6px 16px -6px rgb(109 92 245 / 0.6);
+  --glow-hover: 0 12px 26px -8px rgb(109 92 245 / 0.75);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0c10;
+    --surface: #11151c;
+    --surface-2: #161b23;
+    --surface-3: #1c222c;
+    --border: #232a35;
+    --border-strong: #2e3643;
+    --text: #eef1f5;
+    --text-2: #b8c0cc;
+    --muted: #8b94a3;
+    --accent: #8b7cff;
+    --accent-hover: #a398ff;
+    --accent-press: #b3a8ff;
+    --accent-soft: #1c1640;
+    --accent-fg: #0a0c10;
+    --accent-ring: #6d5cf5;
+    --brand: #c8f560;
+    --brand-strong: #adda3c;
+    --brand-soft: #1e2a08;
+    --brand-fg: #0a0c10;
+    --brand-text: #c8f560;
+    --ok: #adda3c;
+    --ok-soft: #1a2408;
+    --warn: #ffb27d;
+    --warn-soft: #2e1608;
+    --danger: #f47067;
+    --danger-soft: #2c1213;
+    --info: #8beaf3;
+    --info-soft: #072a30;
+    --code-bg: #0e1117;
+    --shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.5);
+    --shadow-2: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 2px 4px rgb(0 0 0 / 0.45), 0 12px 28px rgb(0 0 0 / 0.45);
+    --shadow-3: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 4px 8px rgb(0 0 0 / 0.45), 0 24px 60px rgb(0 0 0 / 0.55), 0 30px 80px -30px rgb(139 124 255 / 0.4);
+    --glow: 0 6px 16px -6px rgb(139 124 255 / 0.55);
+    --glow-hover: 0 12px 26px -8px rgb(139 124 255 / 0.7);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0a0c10;
+  --surface: #11151c;
+  --surface-2: #161b23;
+  --surface-3: #1c222c;
+  --border: #232a35;
+  --border-strong: #2e3643;
+  --text: #eef1f5;
+  --text-2: #b8c0cc;
+  --muted: #8b94a3;
+  --accent: #8b7cff;
+  --accent-hover: #a398ff;
+  --accent-press: #b3a8ff;
+  --accent-soft: #1c1640;
+  --accent-fg: #0a0c10;
+  --accent-ring: #6d5cf5;
+  --brand: #c8f560;
+  --brand-strong: #adda3c;
+  --brand-soft: #1e2a08;
+  --brand-fg: #0a0c10;
+  --brand-text: #c8f560;
+  --ok: #adda3c;
+  --ok-soft: #1a2408;
+  --warn: #ffb27d;
+  --warn-soft: #2e1608;
+  --danger: #f47067;
+  --danger-soft: #2c1213;
+  --info: #8beaf3;
+  --info-soft: #072a30;
+  --code-bg: #0e1117;
+  --shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-2: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 2px 4px rgb(0 0 0 / 0.45), 0 12px 28px rgb(0 0 0 / 0.45);
+  --shadow-3: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 4px 8px rgb(0 0 0 / 0.45), 0 24px 60px rgb(0 0 0 / 0.55), 0 30px 80px -30px rgb(139 124 255 / 0.4);
+  --glow: 0 6px 16px -6px rgb(139 124 255 / 0.55);
+  --glow-hover: 0 12px 26px -8px rgb(139 124 255 / 0.7);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-press: var(--accent-press);
+  --color-accent-ring: var(--accent-ring);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-text: var(--brand-text);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-code: var(--code-bg);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", monospace;
+  --shadow-card: var(--shadow);
+  --shadow-e2: var(--shadow-2);
+  --shadow-e3: var(--shadow-3);
+  --shadow-glow: var(--glow);
+  --shadow-glow-hover: var(--glow-hover);
+  --ease-spring: var(--ease-out);
+}
+
+/* ------------------------------------------------------------------ responsive system
+   1. Layout responds to the space a component actually has (container queries), not the
+      viewport: the copilot panel can take 0-760px, so viewport breakpoints lie.
+   2. Card grids are intrinsic: repeat(auto-fill, minmax(min(100%, X), 1fr)).
+      Columns = floor((W + gap) / (X + gap)), so they reflow continuously with zero breakpoints,
+      and min(100%, X) guarantees no overflow when the container is narrower than X.
+   3. Spacing and titles are fluid: clamp(min, base + k·cqi, max) interpolates linearly with the
+      container's inline size (1cqi = 1% of container width) between two clamps. */
+@utility px-fluid {
+  padding-inline: clamp(1rem, 0.5rem + 2.5cqi, 2rem);
+}
+@utility py-fluid {
+  padding-block: clamp(0.875rem, 0.5rem + 1.5cqi, 1.75rem);
+}
+@utility gap-fluid {
+  gap: clamp(0.75rem, 0.5rem + 1cqi, 1.5rem);
+}
+@utility text-title {
+  font-size: clamp(15px, 13px + 0.6cqi, 20px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+@utility grid-auto-xs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+}
+@utility grid-auto-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+}
+@utility grid-auto-md {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+}
+@utility grid-auto-lg {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+}
+
+/* Base rules live in the base layer so utilities (e.g. focus-visible:outline-none) can override them. */
+@layer base {
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+}
+
+/* Markdown rendered by the assistant */
+.prose-chat {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text);
+}
+.prose-chat p { margin: 0.4em 0; }
+.prose-chat ul, .prose-chat ol { margin: 0.4em 0; padding-left: 1.25em; }
+.prose-chat ul { list-style: disc; }
+.prose-chat ol { list-style: decimal; }
+.prose-chat li { margin: 0.15em 0; }
+.prose-chat strong { font-weight: 600; }
+.prose-chat h1, .prose-chat h2, .prose-chat h3 { font-weight: 600; margin: 0.8em 0 0.3em; font-size: 14px; }
+.prose-chat code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--surface-3);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.prose-chat pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+.prose-chat pre code { background: none; padding: 0; font-size: 12px; }
+.prose-chat table { border-collapse: collapse; margin: 0.5em 0; font-size: 12.5px; display: block; overflow-x: auto; }
+.prose-chat th, .prose-chat td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; }
+.prose-chat th { background: var(--surface-2); font-weight: 600; }
+.prose-chat a { color: var(--accent); text-decoration: underline; }
+
+/* CodeMirror */
+.cm-editor { height: 100%; font-size: 13px; background: var(--code-bg) !important; }
+.cm-editor.cm-focused { outline: none !important; }
+.cm-scroller { font-family: var(--font-mono) !important; }
+.cm-gutters { background: var(--code-bg) !important; border-right: 1px solid var(--border) !important; color: var(--muted) !important; }
+.cm-activeLine, .cm-activeLineGutter { background: color-mix(in srgb, var(--accent) 6%, transparent) !important; }
+.cm-tooltip-autocomplete { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: 8px; box-shadow: var(--shadow-2); overflow: hidden; }
+.cm-tooltip-autocomplete ul li[aria-selected] { background: var(--accent-soft) !important; color: var(--text) !important; }
+
+/* React Flow */
+.react-flow__attribution { display: none; }
+.react-flow__controls-button { background: var(--surface) !important; border-color: var(--border) !important; fill: var(--text) !important; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.typing-dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* ------------------------------------------------------------------ motion
+   Only transform and opacity animate (compositor-only), so it stays smooth on any laptop.
+   Durations: press 120ms, hover 180ms, cards 250ms, panels/pages 300-420ms, one easing curve. */
+
+/* Elevation that responds: rest at e1, hover rises 2-4px to e2/e3. */
+@utility lift {
+  transition: transform 250ms var(--ease-out), box-shadow 250ms var(--ease-out), border-color 180ms;
+  &:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); border-color: var(--border-strong); }
+  &:active { transform: translateY(-1px); transition-duration: 120ms; }
+}
+@utility lift-lg {
+  transition: transform 250ms var(--ease-out), box-shadow 250ms var(--ease-out), border-color 180ms;
+  &:hover { transform: translateY(-4px); box-shadow: var(--shadow-3); }
+}
+@utility pressable {
+  transition: transform 180ms var(--ease-out), background-color 180ms, border-color 180ms, color 180ms, box-shadow 180ms;
+  &:active { transform: translateY(1px) scale(0.985); transition-duration: 120ms; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(4px) scale(0.985); }
+}
+@keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes slide-in-right { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+@keyframes ring-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 45%, transparent); }
+  100% { box-shadow: 0 0 0 9px transparent; }
+}
+
+.animate-rise { animation: rise-in 420ms var(--ease-out) backwards; }
+.animate-pop { animation: pop-in 240ms var(--ease-out) backwards; }
+.animate-slide-right { animation: slide-in-right 300ms var(--ease-out) backwards; }
+.ring-pulse { animation: ring-pulse 2.2s ease-out infinite; }
+/* stagger children: each child rises 40ms after the previous one (first 12) */
+.stagger > * { animation: rise-in 420ms var(--ease-out) backwards; }
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; }
+.stagger > *:nth-child(6) { animation-delay: 200ms; }
+.stagger > *:nth-child(7) { animation-delay: 240ms; }
+.stagger > *:nth-child(8) { animation-delay: 280ms; }
+.stagger > *:nth-child(n + 9) { animation-delay: 320ms; }
+
+@layer components {
+.skeleton {
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--surface-3) 25%, var(--surface-2) 50%, var(--surface-3) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+}
+
+/* Radix overlays: animate both directions (Radix waits for the exit animation before unmounting). */
+.overlay-anim[data-state="open"] { animation: fade-in 200ms var(--ease-out); }
+.overlay-anim[data-state="closed"] { animation: fade-out 160ms ease-in; }
+.dialog-anim[data-state="open"] { animation: pop-in 260ms var(--ease-out); }
+.dialog-anim[data-state="closed"] { animation: pop-out 160ms ease-in; }
+@media (max-width: 639px) {
+  .dialog-anim[data-state="open"] { animation: sheet-in 320ms var(--ease-out); }
+}
+.tip-anim[data-state="delayed-open"], .tip-anim[data-state="instant-open"] { animation: pop-in 160ms var(--ease-out); }
+.tab-panel-anim[data-state="active"] { animation: rise-in 300ms var(--ease-out); }
+
+/* ------------------------------------------------------------------ view transitions
+   Route changes inside a project crossfade the page body with a small rise; the shell
+   (sidebar, header, copilot) is not part of the animation, so it stays anchored. */
+::view-transition { pointer-events: none; }
+::view-transition-old(root) { display: none; }
+::view-transition-new(root) { animation: none; }
+::view-transition-old(.page) { animation: 140ms ease-in both fade-out; }
+::view-transition-new(.page) { animation: 300ms var(--ease-out) 60ms both rise-in; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; }
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) { animation-duration: 0s !important; animation-delay: 0s !important; }
+}
+
+@keyframes slide-in-left { from { transform: translateX(-24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ------------------------------------------------------------------ landing page */
+@keyframes drift { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, -14px, 0); } }
+.tile-drift { animation: drift 9s ease-in-out infinite alternate; will-change: transform; }
+
+/* Scroll reveal: sections start 16px low and transparent, and settle when they enter the viewport.
+   Without JS (or before hydration) [data-reveal] content is fully visible. */
+[data-reveal="hidden"] { opacity: 0; transform: translateY(16px); }
+[data-reveal="shown"] { opacity: 1; transform: none; transition: opacity 600ms var(--ease-out), transform 700ms var(--ease-out); }
+
+.marker { background: linear-gradient(transparent 58%, var(--brand) 58%, var(--brand) 92%, transparent 92%); }
+:root[data-theme="dark"] .marker { background: none; color: var(--brand); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .marker { background: none; color: var(--brand); } }
+
+.layer-card { transition: transform 800ms var(--ease-out), box-shadow 800ms var(--ease-out), filter 800ms var(--ease-out); transform-origin: 50% 0; }
+@media (prefers-reduced-motion: reduce) { .tile-drift { animation: none; } [data-reveal] { opacity: 1 !important; transform: none !important; } }
+
+@layer components {
+/* Landing buttons: 44px targets, violet primary with a glow that follows its shade scale. */
+.lp-btn-primary, .lp-btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 20px; border-radius: 12px; font-size: 15px; font-weight: 600; line-height: 1;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform 180ms var(--ease-out), background-color 180ms, border-color 180ms, box-shadow 180ms, color 180ms;
+}
+.lp-btn-primary { background: var(--accent); color: var(--accent-fg); border: 0; box-shadow: var(--glow); }
+.lp-btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: var(--glow-hover); }
+.lp-btn-primary:active { background: var(--accent-press); transform: translateY(1px); transition-duration: 120ms; }
+.lp-btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); font-weight: 500; box-shadow: var(--shadow); }
+.lp-btn-secondary:hover { border-color: var(--accent-ring); transform: translateY(-1px); box-shadow: var(--shadow-2); }
+.lp-btn-secondary:active { transform: translateY(1px); transition-duration: 120ms; }
+.lp-btn-primary:focus-visible, .lp-btn-secondary:focus-visible { outline: 3px solid var(--accent-ring); outline-offset: 3px; }
+.lp-btn-sm { min-height: 36px; padding: 0 14px; font-size: 13px; border-radius: 10px; }
+}
+@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Reasoning step currently being "thought": text with a light sweeping across it. */
+.thinking-shimmer {
+  background: linear-gradient(90deg, var(--muted) 0%, var(--muted) 35%, var(--text) 50%, var(--muted) 65%, var(--muted) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 1.8s linear infinite;
+}
+
+/* Theme-switched artwork (the wordmark has a light-surface and a dark-surface version). */
+.theme-dark-only { display: none; }
+:root[data-theme="dark"] .theme-dark-only { display: inline-block; }
+:root[data-theme="dark"] .theme-light-only { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-dark-only { display: inline-block; }
+  :root:not([data-theme="light"]) .theme-light-only { display: none; }
+}

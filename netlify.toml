@@ -1,0 +1,11 @@
+# Netlify builds and serves the Next.js front end (landing page + app screens).
+# The Python API and PostgreSQL run elsewhere; the front end reaches them through the /api proxy
+# in frontend/next.config.ts, which reads NORMIE_API_URL (set it in Netlify's environment variables).
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"

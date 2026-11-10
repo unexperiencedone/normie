@@ -1,0 +1,16 @@
+# Keep secrets, local data and build output out of Docker images.
+.env
+.env.*
+!deploy/.env.docker.example
+.venv
+.pgdata
+var
+legacy
+docs
+tests
+.playwright-mcp
+**/__pycache__
+**/node_modules
+**/.next
+frontend/.next
+*.pptx

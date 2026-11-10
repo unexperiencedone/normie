@@ -1,0 +1,80 @@
+# Normie: the whole stack on one machine.
+#
+#   cp deploy/.env.docker.example .env.docker   # then fill in the secrets
+#   docker compose --env-file .env.docker up -d --build
+#
+# Services: db (PostgreSQL 18) <- api (FastAPI) <- web (Next.js) <- caddy (HTTPS, the only public door)
+# Data lives in named volumes, so containers can be rebuilt or restarted without losing anything.
+
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.docker}
+      POSTGRES_DB: control
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d control"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # Users connect to their project databases with psql / GUI tools on this port. Bound to
+    # 127.0.0.1 by default (safe); set DB_PUBLISH=0.0.0.0 to open it to the internet.
+    # DB_PORT changes the outside port (e.g. 5434 when the laptop already runs PostgreSQL on 5432).
+    ports:
+      - "${DB_PUBLISH:-127.0.0.1}:${DB_PORT:-5432}:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/control
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      CREDENTIALS_KEY: ${CREDENTIALS_KEY:?set CREDENTIALS_KEY}
+      AGENT_BASE_URL: ${AGENT_BASE_URL:-https://integrate.api.nvidia.com/v1}
+      AGENT_API_KEY: ${AGENT_API_KEY:-}
+      AGENT_MODEL: ${AGENT_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      PUBLIC_DB_HOST: ${PUBLIC_DB_HOST:-localhost}
+      PUBLIC_DB_PORT: ${DB_PORT:-5432}
+    volumes:
+      - backups:/app/var/backups
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/web.Dockerfile
+      args:
+        NORMIE_API_URL: http://api:8000
+        NEXT_PUBLIC_SITE_URL: ${SITE_URL:-http://localhost}
+    restart: unless-stopped
+    depends_on: [api]
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [web, api]
+    environment:
+      # ":80" = plain http on any address (local testing). A domain name = automatic HTTPS.
+      DOMAIN: ${DOMAIN:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  backups:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DBForge — High-Assurance Agentic Database Control Plane</title>
+  <meta name="description" content="Agentic control plane for relational database design, formal normalization, security policy synthesis, and autonomous performance tuning on PostgreSQL 16.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Collapsible Sidebar -->
+    <aside class="sidebar" id="main-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-symbol">⚡</div>
+        <div class="brand-meta">
+          <span class="brand-name">DBForge</span>
+          <span class="brand-pill">PostgreSQL 16</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="section-label">LIFECYCLE DESIGN</span>
+        <button class="nav-item active" id="tab-btn-design" onclick="switchTab('design')">
+          <span class="nav-icon">🏗️</span>
+          <span class="nav-label">Design Studio</span>
+          <span class="nav-shortcut">⌘1</span>
+        </button>
+        <button class="nav-item" id="tab-btn-schema" onclick="switchTab('schema')">
+          <span class="nav-icon">📐</span>
+          <span class="nav-label">Schema & Normalization</span>
+          <span class="nav-shortcut">⌘2</span>
+        </button>
+        <button class="nav-item" id="tab-btn-security" onclick="switchTab('security')">
+          <span class="nav-icon">🛡️</span>
+          <span class="nav-label">Security & RBAC</span>
+          <span class="nav-shortcut">⌘3</span>
+        </button>
+        <button class="nav-item" id="tab-btn-deploy" onclick="switchTab('deploy')">
+          <span class="nav-icon">🚀</span>
+          <span class="nav-label">Deploy & DDL</span>
+          <span class="nav-shortcut">⌘4</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="section-label">QUERY & DATA</span>
+        <button class="nav-item" id="tab-btn-query" onclick="switchTab('query')">
+          <span class="nav-icon">🔍</span>
+          <span class="nav-label">Query Console</span>
+          <span class="nav-shortcut">⌘5</span>
+        </button>
+        <button class="nav-item" id="tab-btn-transactions" onclick="switchTab('transactions')">
+          <span class="nav-icon">⚡</span>
+          <span class="nav-label">Transactions & Approvals</span>
+          <span class="badge-counter" id="pending-counter">1</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <span class="section-label">OPTIMIZATION & SYLLABUS</span>
+        <button class="nav-item" id="tab-btn-tuning" onclick="switchTab('tuning')">
+          <span class="nav-icon">🏎️</span>
+          <span class="nav-label">Tuning & Evolution</span>
+          <span class="nav-shortcut">⌘7</span>
+        </button>
+        <button class="nav-item" id="tab-btn-concurrency" onclick="switchTab('concurrency')">
+          <span class="nav-icon">🧪</span>
+          <span class="nav-label">Concurrency Lab</span>
+          <span class="nav-pill-new">ACID</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="connection-status">
+          <span class="pulse-dot"></span>
+          <div class="connection-info">
+            <span class="conn-title">Control Plane</span>
+            <span class="conn-meta">Local • 8ms ping</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <div class="viewport">
+      <!-- Top Action Command Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="project-breadcrumb">
+            <span class="org-name">DBForge Cloud</span>
+            <span class="crumb-sep">/</span>
+            <span class="project-name" id="current-project-title">Clinic Management System</span>
+            <span class="version-tag" id="schema-version-badge">DDL v1.0</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="tenant-badge">
+            <span class="badge-label">Tenant:</span>
+            <select id="tenant-select" onchange="changeTenant(this.value)">
+              <option value="clinic">Clinic System (t_clinic)</option>
+              <option value="university">University Enrollment (t_univ)</option>
+              <option value="fintech">Fintech Ledger (t_ledger)</option>
+            </select>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="showQuickHelp()">⌨️ Shortcuts</button>
+          <button class="btn btn-primary btn-sm" onclick="deploySchema()">⚡ Deploy Schema</button>
+        </div>
+      </header>
+
+      <!-- Panel Container -->
+      <main class="content-body">
+        
+        <!-- ============================================== -->
+        <!-- 1. DESIGN STUDIO -->
+        <!-- ============================================== -->
+        <section id="panel-design" class="panel-section active">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Design Studio</h2>
+              <p class="panel-subtitle">Natural language domain requirements converted to formal ER diagrams and relational entities.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-outline btn-sm" onclick="loadDesignPreset('clinic')">Preset: Clinic</button>
+              <button class="btn btn-outline btn-sm" onclick="loadDesignPreset('university')">Preset: University</button>
+              <button class="btn btn-outline btn-sm" onclick="loadDesignPreset('fintech')">Preset: Fintech</button>
+            </div>
+          </div>
+
+          <div class="split-view">
+            <!-- Left: Chat Assistant -->
+            <div class="card glass-card chat-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🤖 Conversational Design Agent</span>
+                <span class="status-pill status-ready">Ready</span>
+              </div>
+              <div class="chat-viewport" id="design-chat-viewport">
+                <div class="chat-msg agent-msg">
+                  <div class="msg-author">Design Agent</div>
+                  <div class="msg-body">
+                    Hello! Describe the domain you want to model. I will extract entities, attributes, primary keys, cardinalities, weak entities, and generalizations, then validate the model against relational constraints.
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="design-prompt-input" placeholder="e.g., Clinic with patients, doctors, appointments, and prescriptions with dosage..." value="I run a clinic with patients, doctors, appointments, and prescriptions with dosage">
+                <button class="btn btn-primary" id="btn-run-design" onclick="submitDesignPrompt()">Synthesize ER</button>
+              </div>
+            </div>
+
+            <!-- Right: Mermaid Visualizer -->
+            <div class="card glass-card diagram-card">
+              <div class="card-title-bar">
+                <span class="card-heading">📊 Entity-Relationship Model (Mermaid.js)</span>
+                <div class="card-tools">
+                  <button class="btn btn-icon btn-sm" onclick="zoomMermaid(1.1)">🔍+</button>
+                  <button class="btn btn-icon btn-sm" onclick="zoomMermaid(0.9)">🔍-</button>
+                  <button class="btn btn-icon btn-sm" onclick="resetMermaidZoom()">↺</button>
+                  <button class="btn btn-secondary btn-sm" id="btn-approve-er" onclick="approveAndAdvance()">Approve ER ➔</button>
+                </div>
+              </div>
+              <div class="diagram-canvas" id="mermaid-canvas">
+                <div class="mermaid" id="mermaid-target">
+                  erDiagram
+                    PATIENT ||--o{ APPOINTMENT : books
+                    DOCTOR ||--o{ APPOINTMENT : attends
+                    PATIENT ||--o{ PRESCRIPTION : receives
+                    DOCTOR ||--o{ PRESCRIPTION : prescribes
+                    PATIENT {
+                      int patient_id PK
+                      string name
+                      date dob
+                      string phone
+                    }
+                    DOCTOR {
+                      int doctor_id PK
+                      string name
+                      string specialty
+                    }
+                    APPOINTMENT {
+                      int appointment_id PK
+                      int patient_id FK
+                      int doctor_id FK
+                      datetime appointment_date
+                      string status
+                    }
+                    PRESCRIPTION {
+                      int prescription_id PK
+                      int patient_id FK
+                      int doctor_id FK
+                      string dosage
+                      date expiry_date
+                    }
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 2. SCHEMA & NORMALIZATION -->
+        <!-- ============================================== -->
+        <section id="panel-schema" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Schema Normalization & Relational Theory Core</h2>
+              <p class="panel-subtitle">Deterministic attribute closure, candidate keys, 1NF to BCNF checking, and Lossless Chase decomposition.</p>
+            </div>
+            <div class="header-actions">
+              <span class="pill pill-violet">100% Pure Python Verified</span>
+            </div>
+          </div>
+
+          <div class="grid-3-col">
+            <!-- Mapped Tables -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">📑 Relational Tables</span>
+                <span class="pill pill-emerald" id="tables-badge">4 Tables</span>
+              </div>
+              <div class="table-card-list" id="schema-tables-container">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Interactive FD Engine -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🧮 Interactive FD Playground</span>
+                <span class="pill pill-cyan">Deterministic Core</span>
+              </div>
+              <div class="form-group">
+                <label>Relation Attributes:</label>
+                <input type="text" id="calc-attrs" value="A, B, C, D, E" class="input-code">
+              </div>
+              <div class="form-group">
+                <label>Functional Dependencies (LHS -> RHS):</label>
+                <textarea id="calc-fds" rows="3" class="input-code">A -> B
+BC -> E
+ED -> A</textarea>
+              </div>
+              <div class="btn-grid">
+                <button class="btn btn-secondary btn-sm" id="btn-calc-closure" onclick="runClosure()">Compute Closure {B,C,D}</button>
+                <button class="btn btn-secondary btn-sm" id="btn-calc-keys" onclick="runCandidateKeys()">Find Minimal Keys</button>
+                <button class="btn btn-primary btn-sm" id="btn-calc-nf" onclick="runNormalFormCheck()">Audit Normal Form</button>
+              </div>
+
+              <div class="code-terminal" id="fd-terminal-output">
+                <span class="terminal-prompt">$ dbforge fd-engine ready</span>
+                <div id="fd-step-log">Click an action above to view mathematical fixpoint derivation.</div>
+              </div>
+            </div>
+
+            <!-- Normal Form Audit & Chase -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🏆 Normal Form Audit & Chase Matrix</span>
+                <span class="pill pill-amber" id="nf-verdict-badge">3NF / BCNF</span>
+              </div>
+              <div class="nf-audit-stack">
+                <div class="nf-card passed">
+                  <div class="nf-card-header">
+                    <span class="status-indicator-sm pass"></span>
+                    <strong>1NF: Atomic Domains</strong>
+                  </div>
+                  <p class="nf-desc">All attributes are primitive; relation has at least one candidate key.</p>
+                </div>
+
+                <div class="nf-card passed">
+                  <div class="nf-card-header">
+                    <span class="status-indicator-sm pass"></span>
+                    <strong>2NF: No Partial Key Dependencies</strong>
+                  </div>
+                  <p class="nf-desc">No non-prime attribute depends on a proper subset of any candidate key.</p>
+                </div>
+
+                <div class="nf-card passed">
+                  <div class="nf-card-header">
+                    <span class="status-indicator-sm pass"></span>
+                    <strong>3NF: No Transitive Dependencies</strong>
+                  </div>
+                  <p class="nf-desc">Every non-trivial FD X ➔ Y has superkey X or prime Y attributes.</p>
+                </div>
+
+                <div class="nf-card info">
+                  <div class="nf-card-header">
+                    <span class="status-indicator-sm info"></span>
+                    <strong>Chase Algorithm Verification:</strong>
+                  </div>
+                  <div class="chase-matrix-view">
+                    <span class="badge badge-emerald">Lossless Join: Verified ✓</span>
+                    <span class="badge badge-emerald">Dependency Preservation: 100% ✓</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 3. ROLES & SECURITY -->
+        <!-- ============================================== -->
+        <section id="panel-security" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Role-Based Access Control & Security Guardrails</h2>
+              <p class="panel-subtitle">Fine-grained column/row visibility matrices and AST-enforced statement simulation.</p>
+            </div>
+          </div>
+
+          <div class="split-view">
+            <!-- Access Matrix -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🛡️ Role Permission Matrix</span>
+                <button class="btn btn-sm btn-secondary" onclick="addSampleRoleModal()">+ New Role</button>
+              </div>
+              <div class="data-table-container">
+                <table class="data-table" id="rbac-table">
+                  <thead>
+                    <tr>
+                      <th>Database Role</th>
+                      <th>Allowed Operations</th>
+                      <th>Sensitive Column Projections</th>
+                      <th>RLS Policies</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="role-pill role-receptionist">t_receptionist</span></td>
+                      <td><code>SELECT, INSERT, UPDATE</code></td>
+                      <td><span class="badge badge-cyan">patient.name</span> <span class="badge badge-cyan">phone</span> <span class="badge badge-rose">diagnosis (MASKED)</span></td>
+                      <td><code>WHERE appointment_date >= CURRENT_DATE</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="role-pill role-doctor">t_doctor</span></td>
+                      <td><code>SELECT, INSERT, UPDATE</code></td>
+                      <td><span class="badge badge-emerald">ALL VISIBLE</span></td>
+                      <td><code>WHERE doctor_id = CURRENT_USER_ID</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="role-pill role-clerk">t_billing_clerk</span></td>
+                      <td><code>SELECT (Read Only)</code></td>
+                      <td><span class="badge badge-amber">amount</span> <span class="badge badge-rose">medical_notes (HIDDEN)</span></td>
+                      <td><code>WHERE tenant_id = CURRENT_TENANT</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Access Simulator -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🧪 Live Policy Access Simulator</span>
+                <span class="pill pill-cyan">AST Enforcement</span>
+              </div>
+              <div class="form-group">
+                <label>Evaluate Statement Against Role:</label>
+                <select id="sim-role-picker" class="input-code">
+                  <option value="receptionist">t_receptionist</option>
+                  <option value="doctor">t_doctor</option>
+                  <option value="billing_clerk">t_billing_clerk</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>SQL Query to Test:</label>
+                <textarea id="sim-query-text" rows="3" class="input-code">SELECT name, phone FROM patient WHERE patient_id = 1;</textarea>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-secondary btn-sm" onclick="setSimQuery('authorized')">Preset: Authorized</button>
+                <button class="btn btn-secondary btn-sm" onclick="setSimQuery('hidden_table')">Preset: Table Leak</button>
+                <button class="btn btn-secondary btn-sm" onclick="setSimQuery('injection')">Preset: Denied Function</button>
+                <button class="btn btn-primary btn-sm" id="btn-eval-access" onclick="evalAccess()">Run Simulator</button>
+              </div>
+              <div class="eval-result-card" id="sim-eval-output">
+                <div class="verdict-banner allowed">
+                  <span class="verdict-icon">✓</span>
+                  <div>
+                    <strong>STATEMENT AUTHORIZED</strong>
+                    <p class="verdict-reason">Query complies with role 't_receptionist' visible columns and statement allow-list.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 4. DEPLOY & DDL -->
+        <!-- ============================================== -->
+        <section id="panel-deploy" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">PostgreSQL DDL & Isolated Tenant Deployment</h2>
+              <p class="panel-subtitle">Topologically sorted tables, foreign key constraints with cascade rules, and B-Tree index synthesis.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary btn-sm" onclick="copyDDL()">📋 Copy DDL</button>
+              <button class="btn btn-success btn-sm" onclick="deploySchema()">⚡ Execute Provisioning Transaction</button>
+            </div>
+          </div>
+
+          <div class="card glass-card ddl-editor-card">
+            <div class="code-editor-header">
+              <span class="file-tab">schema_v1.0.sql</span>
+              <span class="editor-meta">PostgreSQL 16 Dialect • Strict FK Validation</span>
+            </div>
+            <pre class="code-editor-area" id="ddl-editor-content">-- ====================================================
+-- DBForge Autonomous DDL Generation
+-- Tenant: t_clinic_db (Isolated Schema)
+-- ====================================================
+
+CREATE TABLE IF NOT EXISTS patient (
+    patient_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    dob DATE,
+    phone VARCHAR(20),
+    CONSTRAINT pk_patient PRIMARY KEY (patient_id)
+);
+
+CREATE TABLE IF NOT EXISTS doctor (
+    doctor_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    specialty VARCHAR(100),
+    CONSTRAINT pk_doctor PRIMARY KEY (doctor_id)
+);
+
+CREATE TABLE IF NOT EXISTS appointment (
+    appointment_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    appointment_date TIMESTAMPTZ NOT NULL,
+    status VARCHAR(20) DEFAULT 'scheduled',
+    CONSTRAINT pk_appointment PRIMARY KEY (appointment_id),
+    CONSTRAINT fk_appointment_patient FOREIGN KEY (patient_id) REFERENCES patient (patient_id) ON DELETE CASCADE,
+    CONSTRAINT fk_appointment_doctor FOREIGN KEY (doctor_id) REFERENCES doctor (doctor_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS prescription (
+    prescription_id INT NOT NULL,
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    dosage VARCHAR(100) NOT NULL,
+    expiry_date DATE,
+    CONSTRAINT pk_prescription PRIMARY KEY (prescription_id),
+    CONSTRAINT fk_prescription_patient FOREIGN KEY (patient_id) REFERENCES patient (patient_id) ON DELETE CASCADE,
+    CONSTRAINT fk_prescription_doctor FOREIGN KEY (doctor_id) REFERENCES doctor (doctor_id) ON DELETE CASCADE
+);
+
+-- Performance B-Tree Indexes
+CREATE INDEX IF NOT EXISTS idx_appointment_patient ON appointment (patient_id);
+CREATE INDEX IF NOT EXISTS idx_appointment_doctor ON appointment (doctor_id);
+CREATE INDEX IF NOT EXISTS idx_prescription_patient ON prescription (patient_id);
+CREATE INDEX IF NOT EXISTS idx_prescription_doctor ON prescription (doctor_id);</pre>
+            <div id="deploy-notification" class="deploy-banner" style="display:none;"></div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 5. QUERY CONSOLE -->
+        <!-- ============================================== -->
+        <section id="panel-query" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Natural Language Query Console</h2>
+              <p class="panel-subtitle">Dual-tier pipeline: NL ➔ Relational Algebra ($\sigma, \pi, \bowtie, \gamma$) ➔ AST-Validated SQL ➔ Role-Scoped Execution.</p>
+            </div>
+            <div class="header-actions">
+              <span class="role-indicator">Scope: <strong>t_doctor</strong></span>
+            </div>
+          </div>
+
+          <div class="card glass-card query-input-card">
+            <div class="nl-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="nl-query-input" placeholder="Ask a question in plain English..." value="Show tomorrow's appointments for Dr. Rao">
+              <button class="btn btn-primary" id="btn-run-query" onclick="executeNLQuery()">Execute Query</button>
+            </div>
+
+            <div class="query-chip-row">
+              <span class="chip-label">Quick queries:</span>
+              <button class="query-chip" onclick="setQueryText('Show tomorrow\'s appointments for Dr. Rao')">Appointments for Dr. Rao</button>
+              <button class="query-chip" onclick="setQueryText('How many patients registered this month?')">Patients this month</button>
+              <button class="query-chip" onclick="setQueryText('List students with grade above 80 in Databases')">Students above 80</button>
+              <button class="query-chip" onclick="setQueryText('Which doctors have no appointments today?')">Free doctors today</button>
+            </div>
+
+            <!-- Deep Dive Tabs -->
+            <div class="query-tab-nav">
+              <button class="q-tab active" id="qtab-btn-results" onclick="switchQueryTab('results')">Data Results</button>
+              <button class="q-tab" id="qtab-btn-algebra" onclick="switchQueryTab('algebra')">Relational Algebra</button>
+              <button class="q-tab" id="qtab-btn-sql" onclick="switchQueryTab('sql')">Validated SQL AST</button>
+              <button class="q-tab" id="qtab-btn-plan" onclick="switchQueryTab('plan')">EXPLAIN Plan</button>
+              <button class="q-tab" id="qtab-btn-explain" onclick="switchQueryTab('explain')">NL Explanation</button>
+            </div>
+
+            <div class="q-tab-content-area">
+              <!-- Results Grid -->
+              <div id="qtab-panel-results" class="q-subpanel active">
+                <div class="data-table-container">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Patient Name</th>
+                        <th>Doctor</th>
+                        <th>Scheduled Time</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="query-grid-body">
+                      <tr>
+                        <td>Asha Sharma</td>
+                        <td>Dr. Rao</td>
+                        <td>Tomorrow at 10:00 AM</td>
+                        <td><span class="badge badge-emerald">CONFIRMED</span></td>
+                      </tr>
+                      <tr>
+                        <td>Ravi Kumar</td>
+                        <td>Dr. Rao</td>
+                        <td>Tomorrow at 11:30 AM</td>
+                        <td><span class="badge badge-emerald">CONFIRMED</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Relational Algebra -->
+              <div id="qtab-panel-algebra" class="q-subpanel">
+                <div class="algebra-hero-box" id="algebra-math-render">
+                  π_{name, time, status}(σ_{doctor='Dr. Rao' ∧ date='tomorrow'}(Patient ⋈ Appointment ⋈ Doctor))
+                </div>
+                <div class="algebra-badges-row">
+                  <span class="badge badge-cyan">PROJECTION (π)</span>
+                  <span class="badge badge-violet">SELECTION (σ)</span>
+                  <span class="badge badge-emerald">NATURAL JOIN (⋈)</span>
+                </div>
+              </div>
+
+              <!-- Validated SQL -->
+              <div id="qtab-panel-sql" class="q-subpanel">
+                <pre class="code-editor-area" id="query-sql-render">SELECT p.name, a.appointment_date, a.status 
+FROM patient p 
+JOIN appointment a USING (patient_id) 
+JOIN doctor d USING (doctor_id) 
+WHERE d.name = 'Dr. Rao' AND DATE(a.appointment_date) = CURRENT_DATE + INTERVAL '1 day' 
+LIMIT 1000;</pre>
+              </div>
+
+              <!-- Plan -->
+              <div id="qtab-panel-plan" class="q-subpanel">
+                <pre class="code-editor-area" id="query-plan-render">Hash Join  (cost=12.50..45.80 rows=2 width=64) (actual time=0.045..0.082 rows=2 loops=1)
+  Hash Cond: (a.doctor_id = d.doctor_id)
+  ->  Nested Loop  (cost=0.15..32.10 rows=4 width=48)
+        ->  Index Scan using idx_appointment_doctor on appointment a (cost=0.15..16.20 rows=4 width=24)
+              Index Cond: (appointment_date >= (CURRENT_DATE + '1 day'::interval))
+        ->  Index Scan using pk_patient on patient p (cost=0.15..3.95 rows=1 width=32)
+              Index Cond: (p.patient_id = a.patient_id)
+  ->  Hash  (cost=12.20..12.20 rows=1 width=24)
+        ->  Seq Scan on doctor d  (cost=0.00..12.20 rows=1 width=24)
+              Filter: (name = 'Dr. Rao'::text)
+Planning Time: 0.120 ms
+Execution Time: 0.114 ms</pre>
+              </div>
+
+              <!-- Explanation -->
+              <div id="qtab-panel-explain" class="q-subpanel">
+                <p class="explanation-paragraph" id="query-explanation-text">
+                  This query selects the names of patients who have confirmed appointments with Dr. Rao scheduled for tomorrow, by joining the patient, appointment, and doctor tables with a 1000-row safety limit.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 6. TRANSACTIONS & APPROVALS -->
+        <!-- ============================================== -->
+        <section id="panel-transactions" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Transactions, Approvals & Immutable Audit Recovery</h2>
+              <p class="panel-subtitle">Human-in-the-loop approval gating for high-risk mutations, dry runs, and WAL before-image undo.</p>
+            </div>
+          </div>
+
+          <div class="split-view">
+            <!-- Approvals Queue -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">⚠️ Pending Action Approvals</span>
+                <span class="pill pill-rose">1 Pending Decision</span>
+              </div>
+              <div class="approval-deck" id="approvals-deck">
+                <div class="approval-item" id="approval-item-1">
+                  <div class="approval-top">
+                    <span class="badge badge-rose">CRITICAL RISK</span>
+                    <span class="time-ago">2 minutes ago</span>
+                  </div>
+                  <h4 class="action-heading">Bulk Delete: Dormant Patient Records</h4>
+                  <pre class="code-snippet-line">DELETE FROM patient WHERE last_visit &lt; now() - interval '3 years';</pre>
+                  <div class="dry-run-summary">
+                    <span>Dry-run verified in rolled-back transaction:</span>
+                    <strong>142 rows affected</strong>
+                  </div>
+                  <div class="approval-btn-row">
+                    <button class="btn btn-success btn-sm" onclick="decideApprovalAction('approved')">✓ Authorize & Commit</button>
+                    <button class="btn btn-danger btn-sm" onclick="decideApprovalAction('rejected')">✕ Reject & Abort</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Audit Timeline -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">⏱️ Append-Only WAL Audit Log</span>
+                <span class="pill pill-cyan">Hash Chained</span>
+              </div>
+              <div class="audit-stream" id="audit-stream">
+                <div class="audit-entry">
+                  <div class="entry-dot"></div>
+                  <div class="entry-card">
+                    <div class="entry-meta">
+                      <span class="entry-type">COMMIT</span>
+                      <span class="entry-ts">11:34 AM</span>
+                    </div>
+                    <code class="entry-sql">INSERT INTO appointment (id, patient_id) VALUES(104, 88);</code>
+                    <button class="btn btn-outline btn-xs" onclick="triggerUndo('audit_104')">Undo Mutation</button>
+                  </div>
+                </div>
+
+                <div class="audit-entry">
+                  <div class="entry-dot"></div>
+                  <div class="entry-card">
+                    <div class="entry-meta">
+                      <span class="entry-type">DEPLOY</span>
+                      <span class="entry-ts">11:30 AM</span>
+                    </div>
+                    <code class="entry-sql">APPLIED SCHEMA DDL VERSION 1.0</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 7. TUNING & EVOLUTION -->
+        <!-- ============================================== -->
+        <section id="panel-tuning" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Tuning Advisor & Safe Schema Evolution</h2>
+              <p class="panel-subtitle">Automatic index recommendations via pg_stat_statements and rehearsed migrations.</p>
+            </div>
+          </div>
+
+          <div class="split-view">
+            <!-- Tuning -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🏎️ Performance Advisor</span>
+                <button class="btn btn-secondary btn-sm" onclick="runTuningInspection()">Re-analyze Stats</button>
+              </div>
+              <div class="recommendation-deck">
+                <div class="rec-card">
+                  <div class="rec-header">
+                    <span class="badge badge-amber">B+ Tree Composite Recommendation</span>
+                    <span class="rec-score">High Priority</span>
+                  </div>
+                  <h4>Sequential Scan detected on <code>appointment</code></h4>
+                  <p>Filter condition <code>created_at > ... AND status = 'scheduled'</code> is scanning 50,000 rows sequentially.</p>
+                  <pre class="code-editor-area">CREATE INDEX CONCURRENTLY idx_appointment_created_status 
+ON appointment (created_at DESC, status);</pre>
+                  <div class="rec-impact-row">
+                    <span>Predicted Cost Reduction: <strong class="text-emerald">78%</strong></span>
+                    <span>Latency Drop: <strong class="text-emerald">145ms ➔ 8ms</strong></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Evolution -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">🌱 Schema Evolution Agent</span>
+                <span class="pill pill-violet">Zero Downtime Rehearsal</span>
+              </div>
+              <div class="form-group">
+                <label>New Business Requirement:</label>
+                <input type="text" id="evo-req-input" value="We also need to track vaccinations with batch number and expiry dates" class="input-code">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="runSchemaEvolution()">Generate Rehearsed Migration</button>
+
+              <div class="migration-diff-box" id="evo-diff-target">
+                <div class="diff-header">
+                  <span>Forward Migration (Up)</span>
+                  <span class="badge badge-emerald">✓ Rehearsal Clean</span>
+                </div>
+                <pre class="code-editor-area">CREATE TABLE IF NOT EXISTS vaccination (
+    vaccination_id SERIAL PRIMARY KEY,
+    patient_id INT NOT NULL REFERENCES patient(patient_id) ON DELETE CASCADE,
+    batch_number VARCHAR(64) NOT NULL,
+    expiry_date DATE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- 8. CONCURRENCY LAB (ACID Theory Demo) -->
+        <!-- ============================================== -->
+        <section id="panel-concurrency" class="panel-section">
+          <div class="panel-header-row">
+            <div>
+              <h2 class="panel-title">Concurrency & Isolation Lab</h2>
+              <p class="panel-subtitle">Live interactive demonstration of concurrency anomalies, lock contention, and isolation levels.</p>
+            </div>
+          </div>
+
+          <div class="grid-3-col">
+            <!-- Lost Update Demo -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">1. Lost Update Anomaly</span>
+                <span class="badge badge-rose">READ COMMITTED</span>
+              </div>
+              <p class="lab-desc">100 concurrent workers incrementing counter <code>balance = balance + 1</code>.</p>
+              <div class="sim-actions">
+                <button class="btn btn-danger btn-sm" onclick="runLostUpdateSim('unprotected')">Run Unprotected (Fails)</button>
+                <button class="btn btn-success btn-sm" onclick="runLostUpdateSim('for_update')">Run FOR UPDATE (Correct)</button>
+              </div>
+              <div class="sim-result-box" id="lost-update-result">
+                <span>Result:</span> <strong>Click to simulate 100 writers</strong>
+              </div>
+            </div>
+
+            <!-- Deadlock Demo -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">2. Deadlock Detection & Retry</span>
+                <span class="badge badge-amber">40P01 Detection</span>
+              </div>
+              <p class="lab-desc">Txn 1 locks (A then B), Txn 2 locks (B then A). Auto-retry with backoff.</p>
+              <div class="sim-actions">
+                <button class="btn btn-primary btn-sm" onclick="runDeadlockSim()">Trigger Inverted Lock Order</button>
+              </div>
+              <div class="sim-result-box" id="deadlock-result">
+                <span>Result:</span> <strong>Click to test deadlock handling</strong>
+              </div>
+            </div>
+
+            <!-- Write Skew Demo -->
+            <div class="card glass-card">
+              <div class="card-title-bar">
+                <span class="card-heading">3. Write Skew & Serializability</span>
+                <span class="badge badge-cyan">SERIALIZABLE</span>
+              </div>
+              <p class="lab-desc">Doctor on-call constraint: At least one doctor must remain on call.</p>
+              <div class="sim-actions">
+                <button class="btn btn-secondary btn-sm" onclick="runWriteSkewSim('repeatable_read')">Repeatable Read (Anomaly)</button>
+                <button class="btn btn-primary btn-sm" onclick="runWriteSkewSim('serializable')">Serializable (Protected)</button>
+              </div>
+              <div class="sim-result-box" id="write-skew-result">
+                <span>Result:</span> <strong>Click to test write skew constraint</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
