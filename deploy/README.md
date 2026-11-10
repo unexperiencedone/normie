@@ -35,7 +35,7 @@ only if you really want to wipe the volumes too.
 
 ## Put it on a server
 
-**Oracle Cloud step by step (Always Free):** see [`ORACLE.md`](ORACLE.md).
+**Step-by-step guides:** [`AWS.md`](AWS.md) (EC2, runs on credits) · [`ORACLE.md`](ORACLE.md) (Always Free).
 
 
 1. Get a Linux server: Oracle Cloud *Always Free*, or a small Hetzner / DigitalOcean machine.
