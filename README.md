@@ -18,6 +18,7 @@ approval before anything changes**.
 ![React](https://img.shields.io/badge/React-19-0A0C10?logo=react&logoColor=C8F560)
 ![Docker](https://img.shields.io/badge/Docker-one_command-0A0C10?logo=docker&logoColor=C8F560)
 ![Tests](https://img.shields.io/badge/tests-37_passing-6D5CF5)
+![License](https://img.shields.io/badge/license-all_rights_reserved-0A0C10)
 
 [**Quickstart**](#-quickstart) · [**How it works**](#-how-it-works) · [**Features**](#-features) · [**DBMS syllabus**](#-built-on-the-dbms-syllabus) · [**Deploy**](deploy/README.md) · [**Full write-up**](docs/HOW_IT_WORKS.md)
 
@@ -279,5 +280,5 @@ legacy/             the previous implementation, kept for reference
 
 **Normie** · a DBMS project by **Aakshant Kumar**
 
-© 2026 Aakshant Kumar. All rights reserved.
+© 2026 Aakshant Kumar. All rights reserved. The source is shared for viewing only; no reuse is permitted. See [LICENSE](LICENSE).
 </div>
