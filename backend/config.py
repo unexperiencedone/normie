@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     )
     llm_api_key: str = Field("", validation_alias=AliasChoices("AGENT_API_KEY", "LLM_API_KEY", "api_key"))
     llm_model: str = Field(
-        "mistralai/mistral-large-4-1t-a52b", validation_alias=AliasChoices("AGENT_MODEL", "model")
+        "nvidia/nemotron-3-ultra-550b-a55b", validation_alias=AliasChoices("AGENT_MODEL", "model")
     )
     llm_timeout_s: float = 120.0
 

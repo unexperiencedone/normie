@@ -41,7 +41,7 @@ services:
       CREDENTIALS_KEY: ${CREDENTIALS_KEY:?set CREDENTIALS_KEY}
       AGENT_BASE_URL: ${AGENT_BASE_URL:-https://integrate.api.nvidia.com/v1}
       AGENT_API_KEY: ${AGENT_API_KEY:-}
-      AGENT_MODEL: ${AGENT_MODEL:-mistralai/mistral-large-4-1t-a52b}
+      AGENT_MODEL: ${AGENT_MODEL:-nvidia/nemotron-3-ultra-550b-a55b}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
       PUBLIC_DB_HOST: ${PUBLIC_DB_HOST:-localhost}
       PUBLIC_DB_PORT: ${DB_PORT:-5432}
